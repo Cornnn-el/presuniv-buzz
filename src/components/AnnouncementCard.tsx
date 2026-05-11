@@ -5,15 +5,17 @@ import { Announcement } from '@/types';
 import { getCategoryConfig } from './CategoryFilter';
 import { cn } from '@/lib/utils';
 
+
 interface AnnouncementCardProps {
   announcement: Announcement;
   onClick?: () => void;
   className?: string;
+  highlight?: boolean;
 }
 
-export function AnnouncementCard({ announcement, onClick, className }: AnnouncementCardProps) {
+export function AnnouncementCard({ announcement, onClick, className, highlight }: AnnouncementCardProps) {
   const categoryConfig = getCategoryConfig(announcement.category);
-  
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -40,20 +42,37 @@ export function AnnouncementCard({ announcement, onClick, className }: Announcem
   };
 
   const isUpcoming = () => {
-    if (!announcement.startDateTime) return false;
-    const startDate = new Date(announcement.startDateTime);
-    const now = new Date();
-    return startDate > now;
+    if (!announcement.releaseDate) return false;
+
+    const release = new Date(announcement.releaseDate).getTime();
+    const now = Date.now();
+
+    return release > now;
   };
+
+
 
   return (
     <div
+      id={announcement.id}
       className={cn(
-        "announcement-card cursor-pointer group relative overflow-hidden",
+        "announcement-card cursor-pointer group relative overflow-hidden transition-all duration-500",
+        isUpcoming() && "opacity-60 pointer-events-none",
+        highlight && "ring-4 ring-emerald-400 shadow-2xl scale-[1.02]",
         className
       )}
+
       onClick={onClick}
     >
+
+      {isUpcoming() && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-md z-20 rounded-xl">
+          <span className="text-sm font-semibold">
+            Upcoming — Available Soon
+          </span>
+        </div>
+      )}
+
       {/* Featured indicator */}
       {announcement.featured && (
         <div className="absolute top-4 right-4 z-10">
@@ -64,15 +83,16 @@ export function AnnouncementCard({ announcement, onClick, className }: Announcem
         </div>
       )}
 
-      {/* Category badge */}
-      <div className="flex items-center justify-between mb-3">
-        <Badge 
-          variant="secondary" 
-          className={cn("text-xs font-medium", categoryConfig.color)}
+      {/* Category + Status */}
+      <div className="mb-3 space-y-2">
+        {/* Category */}
+        <Badge
+          variant="secondary"
+          className={cn("text-xs font-medium border border-border/50", categoryConfig.color)}
         >
           {categoryConfig.name}
         </Badge>
-        
+
         {/* Status indicators */}
         <div className="flex gap-2">
           {isDeadlineSoon() && (
@@ -129,9 +149,9 @@ export function AnnouncementCard({ announcement, onClick, className }: Announcem
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <MapPin className="w-3 h-3 flex-shrink-0" />
             <span className="truncate">
-              {announcement.location.type === 'online' ? 'Online Event' : 
-               announcement.location.type === 'hybrid' ? 'Hybrid Event' :
-               announcement.location.address || 'TBA'}
+              {announcement.location.type === 'online' ? 'Online Event' :
+                announcement.location.type === 'hybrid' ? 'Hybrid Event' :
+                  announcement.location.address || 'TBA'}
             </span>
           </div>
         )}
@@ -162,11 +182,11 @@ export function AnnouncementCard({ announcement, onClick, className }: Announcem
       )}
 
       {/* Actions */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <div className="text-xs text-muted-foreground">
-          {formatDate(announcement.createdAt)}
+          {formatDate(announcement.releaseDate || announcement.createdAt)}
         </div>
-        
+
         {announcement.externalLinks.length > 0 && (
           <Button
             variant="ghost"
@@ -183,8 +203,10 @@ export function AnnouncementCard({ announcement, onClick, className }: Announcem
         )}
       </div>
 
+
       {/* Hover overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent group-hover:from-accent/5 group-hover:via-transparent group-hover:to-transparent transition-all duration-300 pointer-events-none" />
     </div>
   );
 }
+

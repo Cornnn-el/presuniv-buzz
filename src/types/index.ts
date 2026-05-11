@@ -1,10 +1,10 @@
-export type AnnouncementCategory = 
-  | 'organization' 
-  | 'contest' 
-  | 'event' 
-  | 'academic' 
-  | 'scholarship' 
-  | 'career' 
+export type AnnouncementCategory =
+  | 'organization'
+  | 'contest'
+  | 'event'
+  | 'academic'
+  | 'scholarship'
+  | 'career'
   | 'admin';
 
 export interface Announcement {
@@ -47,6 +47,7 @@ export interface Announcement {
   updatedAt: string;
   status: 'draft' | 'published' | 'archived';
   featured: boolean;
+  releaseDate?: string;
 }
 
 export interface Category {
@@ -77,5 +78,31 @@ export interface FilterOptions {
   thisWeek?: boolean;
   search?: string;
 }
+
+export interface AnnouncementForm {                                //baru until line 91
+  category: AnnouncementCategory;
+  title: string;
+  description: string;
+  personInCharge: string;
+  location: string;
+  dateTime: string;
+  deadline: string;
+  releaseDate: string;
+  link: string;
+  tags: string;
+
+}
+
+
+export type CalendarEventType = "release" | "deadline" | "event";             //baru
+
+export interface CalendarEvent {                                      //baru
+  id: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  type: CalendarEventType;
+}
+
+
 
 export type SortOption = 'newest' | 'upcoming' | 'deadline' | 'featured';

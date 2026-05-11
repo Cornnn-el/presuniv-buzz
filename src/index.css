@@ -11,63 +11,63 @@
     /* Base colors - President University brand */
     --background: 0 0% 100%;
     --foreground: 220 39% 11%;
-    
+
     /* Card system */
     --card: 0 0% 100%;
     --card-foreground: 220 39% 11%;
     --card-hover: 210 40% 98%;
-    
+
     /* Popover system */
     --popover: 0 0% 100%;
     --popover-foreground: 220 39% 11%;
-    
+
     /* Primary brand colors - Slate 900 */
     --primary: 220 39% 11%;
     --primary-foreground: 0 0% 100%;
     --primary-light: 215 20.2% 65.1%;
-    
+
     /* Accent colors - Blue 600 */
     --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
     --accent-light: 213 97% 87%;
     --accent-hover: 217 91% 55%;
-    
+
     /* Secondary neutral colors */
     --secondary: 210 40% 96%;
     --secondary-foreground: 220 39% 11%;
     --secondary-hover: 210 40% 92%;
-    
+
     /* Muted colors for less important content */
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
-    
+
     /* Status colors */
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
     --success-light: 142 69% 90%;
-    
+
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     --warning-light: 48 96% 89%;
-    
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    
+
     /* Interactive elements */
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 217 91% 60%;
-    
+
     /* Shadows and effects */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    
+
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
     --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-light)));
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
-    
+
     /* Animations */
     --transition-fast: 150ms ease-in-out;
     --transition-normal: 250ms ease-in-out;
@@ -96,48 +96,48 @@
     /* Base colors - dark mode */
     --background: 220 39% 5%;
     --foreground: 210 40% 98%;
-    
+
     /* Card system - dark mode */
     --card: 220 39% 8%;
     --card-foreground: 210 40% 98%;
     --card-hover: 220 39% 10%;
-    
+
     /* Popover system - dark mode */
     --popover: 220 39% 8%;
     --popover-foreground: 210 40% 98%;
-    
+
     /* Primary colors - adjusted for dark mode */
     --primary: 210 40% 98%;
     --primary-foreground: 220 39% 11%;
     --primary-light: 215 20.2% 75%;
-    
+
     /* Accent colors - blue in dark mode */
     --accent: 217 91% 65%;
     --accent-foreground: 220 39% 5%;
     --accent-light: 213 97% 80%;
     --accent-hover: 217 91% 70%;
-    
+
     /* Secondary colors - dark mode */
     --secondary: 220 39% 15%;
     --secondary-foreground: 210 40% 98%;
     --secondary-hover: 220 39% 18%;
-    
+
     /* Muted colors - dark mode */
     --muted: 220 39% 15%;
     --muted-foreground: 215 20.2% 65%;
-    
+
     /* Status colors - adjusted for dark mode */
     --success: 142 76% 45%;
     --success-foreground: 0 0% 100%;
     --success-light: 142 69% 20%;
-    
+
     --warning: 38 92% 55%;
     --warning-foreground: 0 0% 100%;
     --warning-light: 48 96% 15%;
-    
+
     --destructive: 0 84% 65%;
     --destructive-foreground: 0 0% 100%;
-    
+
     /* Interactive elements - dark mode */
     --border: 220 39% 18%;
     --input: 220 39% 15%;
@@ -154,35 +154,42 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
   }
 }
 
 @layer components {
+
   /* Category chips */
   .category-chip {
     @apply inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors;
   }
-  
+
   .category-chip-active {
     @apply bg-accent text-accent-foreground;
   }
-  
+
   .category-chip-inactive {
     @apply bg-secondary text-secondary-foreground hover:bg-secondary-hover;
   }
 
   /* Announcement cards */
   .announcement-card {
-    @apply bg-card hover:bg-card-hover rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200 border border-border;
+    @apply bg-card hover:bg-card-hover rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 border border-border/70;
   }
+
 
   /* Custom gradients */
   .gradient-hero {
     background: var(--gradient-hero);
   }
-  
+
   .gradient-accent {
     background: var(--gradient-accent);
   }
@@ -191,15 +198,15 @@
   .status-success {
     @apply bg-success text-success-foreground;
   }
-  
+
   .status-warning {
     @apply bg-warning text-warning-foreground;
   }
-  
+
   .status-success-light {
     @apply bg-success-light text-success;
   }
-  
+
   .status-warning-light {
     @apply bg-warning-light text-warning;
   }

@@ -1,19 +1,61 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/Header';
+import { Footer } from "@/components/Footer";
 import { CategoryFilter } from '@/components/CategoryFilter';
 import { AnnouncementCard } from '@/components/AnnouncementCard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { announcements } from '@/data/announcements';
+import { useAnnouncements } from "@/context/AnnouncementContext";               //baru
 import { AnnouncementCategory, SortOption } from '@/types';
 import { Filter, SortAsc, Plus, Rss, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { TypewriterHero } from '@/components/TypewriterHero';                   //baru
+import { Link, useNavigate, useLocation } from "react-router-dom";              //baru
+import { MoreFilters, FiltersState } from "@/components/MoreFilters";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 
 const Index = () => {
+  const { announcements } = useAnnouncements();                                 //baru
+  const navigate = useNavigate();                                               //baru
+  const location = useLocation();                                               //baru
   const [selectedCategory, setSelectedCategory] = useState<AnnouncementCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [activeTab, setActiveTab] = useState('latest');
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [extraFilters, setExtraFilters] = useState<FiltersState | null>(null);
+
+
+  useEffect(() => {
+    if (location.state?.scrollToId) {
+      const id = location.state.scrollToId;
+
+      // reset filter & tab biar pasti muncul
+      setSelectedCategory('all');
+      setSearchQuery('');
+      setActiveTab('latest');
+
+      setTimeout(() => {
+        const element = document.getElementById(id);
+
+        if (element) {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+
+          setHighlightId(id);
+
+          setTimeout(() => {
+            setHighlightId(null);
+          }, 2500);
+        }
+      }, 200);
+    }
+  }, [location]);
+
+
 
   // Filter and sort announcements
   const filteredAnnouncements = useMemo(() => {
@@ -39,7 +81,62 @@ const Index = () => {
 
     // Tab-based filtering
     const now = new Date();
-    
+
+
+    // ✅ EXTRA FILTERS LOGIC
+    if (extraFilters) {
+      filtered = filtered.filter((announcement) => {
+        const start = announcement.startDateTime
+          ? new Date(announcement.startDateTime)
+          : null;
+
+        const deadline = announcement.deadline
+          ? new Date(announcement.deadline)
+          : null;
+
+        const date = start || deadline;
+
+        if (!date) return false;
+
+        // Today
+        if (extraFilters.today) {
+          if (date.toDateString() !== now.toDateString()) return false;
+        }
+
+        // This week
+        if (extraFilters.thisWeek) {
+          const nextWeek = new Date();
+          nextWeek.setDate(now.getDate() + 7);
+          if (!(date >= now && date <= nextWeek)) return false;
+        }
+
+        // This month
+        if (extraFilters.thisMonth) {
+          if (
+            date.getMonth() !== now.getMonth() ||
+            date.getFullYear() !== now.getFullYear()
+          )
+            return false;
+        }
+
+        // Upcoming
+        if (extraFilters.upcoming) {
+          if (!start || start <= now) return false;
+        }
+
+        // Closing soon (<= 7 days)
+        if (extraFilters.closingSoon) {
+          if (!deadline) return false;
+          const diff =
+            (deadline.getTime() - now.getTime()) / (1000 * 3600 * 24);
+          if (diff > 7 || diff < 0) return false;
+        }
+
+        return true;
+      });
+    }
+
+
     if (activeTab === 'upcoming') {
       filtered = filtered.filter(announcement => {
         if (announcement.startDateTime) {
@@ -81,14 +178,14 @@ const Index = () => {
     });
 
     return filtered;
-  }, [selectedCategory, searchQuery, sortBy, activeTab]);
+  }, [announcements, selectedCategory, searchQuery, sortBy, activeTab, extraFilters]);
 
   const getTabCount = (tab: string) => {
     const now = new Date();
-    
+
     if (tab === 'latest') return announcements.length;
     if (tab === 'upcoming') {
-      return announcements.filter(a => 
+      return announcements.filter(a =>
         a.startDateTime && new Date(a.startDateTime) > now
       ).length;
     }
@@ -105,35 +202,57 @@ const Index = () => {
     return 0;
   };
 
+
+
   return (
     <div className="min-h-screen bg-background">
-      <Header onSearch={setSearchQuery} searchQuery={searchQuery} />
-      
+      {/*<Header onSearch={setSearchQuery} searchQuery={searchQuery} />*/}                {/*baru*/}
+      <Header
+        onSearch={setSearchQuery}
+        searchQuery={searchQuery}
+        onLogoClick={() => {
+          setSelectedCategory('all');
+          setSearchQuery('');
+          setActiveTab('latest');
+        }}
+      />
+
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="max-w-3xl mx-auto">
+            {/*
             <h1 className="text-4xl md:text-5xl font-bold gradient-hero bg-clip-text text-transparent mb-4">
               Stay Connected with Campus Life
             </h1>
+            */}
+
+            <TypewriterHero />                              {/*baru*/}
+
             <p className="text-xl text-muted-foreground mb-8">
               Your central hub for all President University announcements, events, and opportunities.
               Never miss an important update again.
             </p>
-            
+
             <div className="flex flex-wrap justify-center gap-4">
-              <Button className="bg-accent text-accent-foreground hover:bg-accent-hover">
-                <Plus className="w-4 h-4 mr-2" />
-                Submit Announcement
-              </Button>
-              <Button variant="outline">
-                <Calendar className="w-4 h-4 mr-2" />
-                View Calendar
-              </Button>
-              <Button variant="outline">
+              <Link to="/submit-announcement">                                                 {/*baru*/}
+                <Button className="bg-accent text-accent-foreground hover:bg-accent-hover">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Submit Announcement
+                </Button>
+              </Link>
+
+              <Link to="/calendar">                                                           {/*baru*/}
+                <Button variant="outline">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  View Calendar
+                </Button>
+              </Link>
+
+              {/* <Button variant="outline">
                 <Rss className="w-4 h-4 mr-2" />
                 RSS Feed
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
@@ -147,16 +266,36 @@ const Index = () => {
                 onCategoryChange={setSelectedCategory}
               />
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Filter className="w-4 h-4 mr-2" />
-                More Filters
-              </Button>
-              <Button variant="outline" size="sm">
-                <SortAsc className="w-4 h-4 mr-2" />
-                Sort: {sortBy}
-              </Button>
+              <MoreFilters onApply={(filters) => setExtraFilters(filters)} />
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <SortAsc className="w-4 h-4 mr-2" />
+                    Sort: {sortBy}
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setSortBy("newest")}>
+                    Newest
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => setSortBy("upcoming")}>
+                    Upcoming
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => setSortBy("deadline")}>
+                    Deadline
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => setSortBy("featured")}>
+                    Featured
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
@@ -200,8 +339,8 @@ const Index = () => {
                     <AnnouncementCard
                       key={announcement.id}
                       announcement={announcement}
+                      highlight={highlightId === announcement.id}
                       onClick={() => {
-                        // Navigate to announcement detail page
                         console.log('Navigate to:', announcement.slug);
                       }}
                     />
@@ -217,16 +356,18 @@ const Index = () => {
                       No announcements found
                     </h3>
                     <p className="text-muted-foreground mb-4">
-                      {searchQuery 
+                      {searchQuery
                         ? `No results found for "${searchQuery}". Try adjusting your search terms.`
                         : 'There are no announcements in this category at the moment.'
                       }
                     </p>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => {
                         setSearchQuery('');
                         setSelectedCategory('all');
+                        setActiveTab('latest');
+                        setExtraFilters(null);
                       }}
                     >
                       Clear filters
@@ -239,7 +380,8 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Footer */}
+      <Footer />
+      {/* Footer 
       <footer className="border-t bg-muted/30 mt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -254,7 +396,7 @@ const Index = () => {
                 Your central hub for campus announcements and updates.
               </p>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-3">Quick Links</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
@@ -264,7 +406,7 @@ const Index = () => {
                 <li><a href="#" className="hover:text-foreground transition-colors">About</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-3">Contact</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
@@ -274,7 +416,7 @@ const Index = () => {
                 <li>Cikarang, West Java</li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-3">Subscribe</h4>
               <p className="text-sm text-muted-foreground mb-3">
@@ -285,12 +427,13 @@ const Index = () => {
               </Button>
             </div>
           </div>
-          
+
           <div className="border-t pt-6 mt-6 text-center text-sm text-muted-foreground">
             <p>&copy; 2024 President University. All rights reserved.</p>
           </div>
         </div>
-      </footer>
+      </footer> 
+      */}
     </div>
   );
 };
