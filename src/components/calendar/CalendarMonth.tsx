@@ -125,7 +125,7 @@ export const CalendarMonth = ({ year, month, announcements, }: CalendarMonthProp
                                             <div
                                                 key={a.id}
                                                 onClick={() => {
-                                                    navigate("/", { state: { scrollToId: a.id } });
+                                                    navigate("/hub", { state: { scrollToId: a.id } });
                                                 }}
                                                 className={cn(
                                                     "text-[10px] truncate rounded px-1 py-[2px] font-medium cursor-pointer hover:opacity-80",
@@ -176,7 +176,7 @@ export const CalendarMonth = ({ year, month, announcements, }: CalendarMonthProp
                                         key={a.id}
                                         onClick={() => {
                                             setSelectedDayEvents(null); // tutup modal dulu
-                                            navigate("/", { state: { scrollToId: a.id } });
+                                            navigate("/hub", { state: { scrollToId: a.id } });
                                         }}
                                         className={cn(
                                             "text-xs rounded px-2 py-1 font-medium cursor-pointer hover:opacity-80",

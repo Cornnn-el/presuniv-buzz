@@ -8,12 +8,17 @@ export const sendAnnouncementEmail = async (
     content: string
 ) => {
     try {
-        await resend.emails.send({
+        const data = await resend.emails.send({
             from: "Synapse <onboarding@resend.dev>",
-            to: "wirahusna1@gmail.com",
+            to: emails,
             subject: `New Announcement: ${title}`,
-            html: `<h2>${title}</h2><p>${content}</p>`,
+            html: `
+                <h2>${title}</h2>
+                <p>${content}</p>
+            `,
         });
+
+        console.log("SUCCESS:", data);
     } catch (error) {
         console.error("Email error:", error);
     }

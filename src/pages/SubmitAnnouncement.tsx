@@ -140,7 +140,7 @@ const SubmitAnnouncement = () => {
             console.log("FUNCTION DATA:", data);
             console.log("FUNCTION ERROR:", error);
 
-            navigate("/");
+            navigate("/hub");
         } catch (err) {
             console.error(err);
         }
@@ -425,7 +425,7 @@ const SubmitAnnouncement = () => {
                         <Button
                             variant="outline"
                             className="border-white/20 hover:bg-white/5"
-                            onClick={() => navigate("/")}                                        //baru
+                            onClick={() => navigate("/hub")}                                        //baru
                         >
                             Cancel
                         </Button>
@@ -450,8 +450,17 @@ const SubmitAnnouncement = () => {
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={submitAnnouncement}>
+                        <AlertDialogCancel type="button">
+                            Cancel
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                submitAnnouncement();
+                            }}
+                        >
                             Yes, Submit
                         </AlertDialogAction>
                     </AlertDialogFooter>
